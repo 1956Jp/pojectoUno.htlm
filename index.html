@@ -1,577 +1,148 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compra,Venta y Alquiler</title>
-</head>
-<body>
-
-
-
-    <?php
-// =============================================
-// SECCIÓN 1: CONFIGURACIÓN SEGURA DE LA CONEXIÓN
-// =============================================
-
-// Usar variables de entorno en lugar de credenciales fijas (¡NUNCA dejar expuestas!)
-$host = 'localhost';
-$dbname = 'nombre_base_datos';
-$user = 'usuario_seguro';
-$password = 'contraseña_fuerte_123!';
-
-// Crear conexión con MySQLi (orientado a objetos)
-$mysqli = new mysqli($host, $user, $password, $dbname);
-
-// Verificar conexión
-if ($mysqli->connect_error) {
-    error_log("Error de conexión: " . $mysqli->connect_error); // Log para debug
-    die("Error técnico. Por favor contacte al administrador."); // Mensaje genérico al usuario
-}
-
-// =============================================
-// SECCIÓN 2: PROCESAMIENTO SEGURO DEL FORMULARIO
-// =============================================
-
-$errores = [];
-$datos = [];
-
-// Validar método POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    <title>Bolívar Propiedades 4.0 - Mercado Inmobiliario Inteligente</title>
     
-    // Sanitizar y validar campos
-    $nombre = filter_input(INPUT_POST, 'nombre', FILTER_SANITIZE_STRING);
-    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
-    $mensaje = filter_input(INPUT_POST, 'mensaje', FILTER_SANITIZE_SPECIAL_CHARS);
-
-    // Validaciones personalizadas
-    if (empty($nombre) || strlen($nombre) > 50) {
-        $errores[] = 'El nombre es requerido (máx. 50 caracteres)';
-    }
-
-    if (!$email) {
-        $errores[] = 'El email no es válido';
-    }
-
-    // Si no hay errores, insertar en BD
-    if (empty($errores)) {
-        try {
-            // Sentencia preparada para prevenir inyección SQL
-            $stmt = $mysqli->prepare("INSERT INTO contactos (nombre, email, mensaje) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $nombre, $email, $mensaje);
-            
-            if ($stmt->execute()) {
-                $datos['exito'] = "Mensaje enviado correctamente";
-            } else {
-                throw new Exception("Error al guardar");
-            }
-            
-            $stmt->close();
-        } catch (Exception $e) {
-            error_log("Error en consulta: " . $e->getMessage());
-            $errores[] = "Error al procesar la solicitud";
-        }
-    }
-}
-
-// =============================================
-// SECCIÓN 3: FORMULARIO HTML (MEJORADO)
-// =============================================
-?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Formulario Seguro</title>
-    <!-- Incluir Bootstrap para mejor UI -->
+    <!-- Hojas de estilo -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css">
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #e67e22;
+        }
+
+        .property-card {
+            transition: transform 0.3s;
+            border: 2px solid var(--primary-color);
+        }
+
+        .property-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .map-container {
+            height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .price-tag {
+            background: var(--secondary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+    </style>
 </head>
-<body class="container mt-5">
-    <?php if (!empty($errores)): ?>
-        <div class="alert alert-danger">
-            <?php foreach ($errores as $error): ?>
-                <p><?= htmlspecialchars($error) ?></p>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
+<body class="bg-light">
 
-    <?php if (isset($datos['exito'])): ?>
-        <div class="alert alert-success">
-            <?= htmlspecialchars($datos['exito']) ?>
-        </div>
-    <?php endif; ?>
+<!-- Header -->
+<header class="bg-primary text-white py-4">
+    <div class="container">
+        <h1 class="mb-0">🏠 Bolívar Propiedades 4.0</h1>
+        <p class="lead">Tu mercado inmobiliario inteligente en Puerto Ordaz</p>
+    </div>
+</header>
 
-    <form method="POST" action="">
-        <div class="mb-3">
-            <label class="form-label">Nombre:</label>
-            <input type="text" name="nombre" class="form-control" required maxlength="50" value="<?= isset($nombre) ? htmlspecialchars($nombre) : '' ?>">
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Email:</label>
-            <input type="email" name="email" class="form-control" required value="<?= isset($email) ? htmlspecialchars($email) : '' ?>">
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Mensaje:</label>
-            <textarea name="mensaje" class="form-control" required><?= isset($mensaje) ? htmlspecialchars($mensaje) : '' ?></textarea>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Enviar</button>
-    </form>
-</body>
-</html>
-
-<?php
-// Cerrar conexión
-$mysqli->close();
-?>
-        
-    
-     
-       <form>
-        <label for="nombre">Nombre</label>
-        <input type="text" id="nombre" name="nonmbre" placeholder="Nombre"/>
-        <br>
-        <label for="nombre">Apellido</label>
-        <input type="text" id="apellido" name="apellido" placeholder="Apellido"/>
-        <br>
-        <textarea id="comentariaction="/formulario" methodo="POST"o" placeholder="Ingrese comentario" name="comentario"></textarea>
-        <br>
-        <label for="comentario">Comentario</label>
-        <br><h>Compra y Venta Comunal</h>
-
-        <button>Enviar</button>
-
-<br>
-
-    </form>
-
-    <h1>Compra, Venta,Alquiler y Permuta de Casas, Apartamentos y Negocios.</h1>
-    <h2>Puedes colocar tus Bienes para la venta y negociar directamente con los oferentes
-    <p>Servicios de intercambio de vivienda en Puerto Ordaz: ¿Necesitas una solución habitacional urgente? Ofrecemos una plataforma segura y accesible para facilitar intercambios de vivienda en compra, alquiler o permuta en Puerto Ordaz, Venezuela. Conectamos familias que buscan adaptar su hogar a nuevas necesidades económicas, laborales o personales, optimizando recursos sin intermediarios costosos. Publica tu propiedad de forma gratuita, explora opciones personalizadas y negocia directamente con otros usuarios. Contamos con herramientas de verificación y asesoría básica para garantizar transparencia en cada transacción. ¡Encuentra o ofrece viviendas disponibles y resuelve desafíos habitacionales de manera ágil y colaborativa!</p>
-    <form>
-        <imput/>
-
-    </form>
-    <h2>1.Casas en Venta</h2>
-    
-    <h3>Amplio catálogo de casas, quintas y townhouses en zonas como Los Olivos, Los Saltos y Villa Victoria</h3>
-    <a target="_blank" href="https://listado.mercadolibre.com.ve/inmuebles/venta/bolivar/pto-ordaz/">En Mercado Libre</a>
-    <h3>Listados detallados con precios en dólares, incluyendo propiedades en Villa Alta, Río Caura y Arivana</h3>
-    <a target="_blank" href="https://venezuela.bienesonline.com/buscar-venta-casas-en-puerto-ordaz.php">Bienes on Line</a>
-    
-    <h2>2.Apartamentos en Venta</h2>
-
-    <h3>Apartamentos nuevos y usados en zonas premium como Alta Vista, Arivana y Los Samanes</h3>
-    <a target="_blank" href="https://listado.mercadolibre.com.ve/inmuebles/apartamentos/venta/bolivar/pto-ordaz/">Mercado Libre</a>
-    <h3>Ofertas exclusivas en residenciales como Kamila Suites y Grand Palms, con opciones desde $16,000</h3>
-    
-    <a target="_blank" href=":https://venezuela.bienesonline.com/buscar-venta-apartamento-en-puerto-ordaz.php">Bienes On Line</a>
-    
-    <h3>Propiedades destacadas en Parque Los Saltos y Alta Vista, con precios desde $13,100 </h3>
-    
-    <a target="_blank" href="https://inmuebleoferta.com.ve/ciudad/puerto-ordaz/">Ofertas</a>
-    
-    
-
-    <h3>Locales en venta/alquiler en zonas estratégicas como Castillito, Macro Centro 1 y C.C. Costa América, con áreas desde 19 m² hasta 575 m²</h3>
-    <a target="_blank" href="https://venezuela.bienesonline.com/buscar-local-puerto-ordaz-puerto-ordaz.php">Bienes On Line</a>
-    
-
-    <img src="img/sealquila.jpeg" width="400"/>
-    <br>
-
-
-    <section>
-        <!DOCTYPE html>
-        <html lang="es">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Bolívar Propiedades 4.0 - Mercado Inmobiliario Inteligente</title>
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css">
-            <style>
-                :root {
-                    --primary-color: #2c3e50;
-                    --secondary-color: #e67e22;
-                }
-        
-                body {
-                    font-family: 'Roboto', sans-serif;
-                    background: linear-gradient(to right, #f5f6fa, #dcdde1);
-                }
-        
-                .geo-map {
-                    height: 500px;
-                    border-radius: 15px;
-                    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-                }
-        
-                .property-card {
-                    background: rgba(255, 255, 255, 0.9);
-                    backdrop-filter: blur(10px);
-                    transition: transform 0.3s, box-shadow 0.3s;
-                    cursor: pointer;
-                    border: 2px solid var(--primary-color);
-                }
-        
-                .property-card:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-                }
-        
-                .price-tag {
-                    background: var(--secondary-color);
-                    color: white;
-                    padding: 8px 15px;
-                    border-radius: 25px;
-                    position: absolute;
-                    top: -15px;
-                    right: 15px;
-                }
-        
-                .crypto-badge {
-                    background: #2980b9;
-                    color: white;
-                    padding: 5px 10px;
-                    border-radius: 15px;
-                    font-size: 0.8em;
-                }
-        
-                .filter-section {
-                    background: rgba(255, 255, 255, 0.95);
-                    padding: 20px;
-                    border-radius: 15px;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-                }
-        
-                #propertyModal .carousel-item {
-                    height: 400px;
-                    background-size: cover;
-                    background-position: center;
-                }
-        
-                .blockchain-verify {
-                    font-family: 'Courier New', monospace;
-                    background: #2c3e50;
-                    color: #fff;
-                    padding: 10px;
-                    border-radius: 5px;
-                    font-size: 0.8em;
-                }
-            </style>
-        </head>
-        <body>
-            <!-- Cabecera con búsqueda inteligente -->
-            <header class="container-fluid py-4 bg-primary text-white">
-                <div class="container">
-                    <h1 class="mb-4">🏠 Bolívar Propiedades 4.0</h1>
-                    <div class="row g-3">
-                        <div class="col-lg-4">
-                            <input type="text" class="form-control" id="searchInput" placeholder="🔍 Buscar por palabra clave...">
-                        </div>
-                        <div class="col-lg-3">
-                            <select class="form-select" id="propertyType">
-                                <option value="">Todos los tipos</option>
-                                <option value="casa">Casas</option>
-                                <option value="apartamento">Apartamentos</option>
-                                <option value="terreno">Terrenos</option>
-                            </select>
-                        </div>
-                        <div class="col-lg-3">
-                            <input type="range" class="form-range" id="priceRange" min="0" max="1000000">
-                        </div>
-                        <div class="col-lg-2">
-                            <button class="btn btn-warning w-100" id="searchButton">Buscar</button>
-                        </div>
-                    </div>
-                </div>
-            </header>
-        
-            <!-- Sección principal con mapa y resultados -->
-            <main class="container my-5">
-                <div class="row g-4">
-                    <!-- Mapa interactivo -->
-                    <div class="col-lg-8">
-                        <div id="map" class="geo-map"></div>
+<!-- Formulario de Contacto -->
+<main class="container my-5">
+    <section class="card shadow-lg mb-5">
+        <div class="card-body">
+            <h2 class="h4 mb-4">📝 Formulario de Contacto</h2>
+            <form action="/procesar-formulario" method="POST">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="nombre" class="form-label">Nombre completo</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required maxlength="50">
                     </div>
                     
-                    <!-- Filtros avanzados -->
-                    <div class="col-lg-4">
-                        <div class="filter-section">
-                            <h5>🔍 Filtros Avanzados</h5>
-                            <div class="mb-3">
-                                <label class="form-label">Rango de precios (USD)</label>
-                                <div id="priceSlider"></div>
-                            </div>
-                            <div class="mb-3">
-        
-        <label class="form-label">Características</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="poolCheck">
-                            <label class="form-check-label" for="poolCheck">Piscina</label>
-                        </div>
-                        <!-- Más checkboxes -->
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Correo electrónico</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
                     </div>
-                    <button class="btn btn-secondary w-100">Aplicar Filtros</button>
+                    
+                    <div class="col-12">
+                        <label for="mensaje" class="form-label">Mensaje</label>
+                        <textarea class="form-control" id="mensaje" name="mensaje" rows="4" required></textarea>
+                    </div>
+                    
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Enviar consulta</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Listado de Propiedades -->
+    <section class="row g-4">
+        <div class="col-md-4">
+            <div class="card property-card h-100">
+                <img src="img/casa.jpg" class="card-img-top" alt="Casa en venta">
+                <div class="card-body">
+                    <div class="price-tag">$120,000</div>
+                    <h3 class="h5">Casa en Los Olivos</h3>
+                    <p>3 habitaciones • 2 baños • 150 m²</p>
+                    <a href="#" class="btn btn-outline-primary">Ver detalles</a>
                 </div>
             </div>
         </div>
 
-        <!-- Grid de propiedades -->
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-4" id="propertyGrid">
-            <!-- Las propiedades se cargarán dinámicamente aquí -->
-        </div>
-    </main>
+        <!-- Repetir tarjetas de propiedades -->
+    </section>
 
-    <!-- Modal de detalle de propiedad -->
-    <div class="modal fade" id="propertyModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Detalle de Propiedad</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="propertyCarousel" class="carousel slide">
-                        <div class="carousel-inner"></div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">‹</button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">›</button>
-                    </div>
-                    <div class="row mt-4">
-                        <div class="col-md-8">
-                            <h3 id="propertyTitle"></h3>
-                            <div class="blockchain-verify">📌 Transacción segura: <span id="propertyHash"></span></div>
-                            <p id="propertyDescription"></p>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4 class="card-title">💵 Precio</h4>
-                                    <p class="display-6" id="propertyPrice"></p>
-                                    <button class="btn btn-success w-100 mb-2" onclick="initiateTransaction()">Comprar Ahora</button>
-                                    <button class="btn btn-outline-primary w-100">Contactar Agente</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- Mapa Interactivo -->
+    <section class="mt-5">
+        <h2 class="h4 mb-3">📍 Ubicación de Propiedades</h2>
+        <div id="map" class="map-container"></div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h3 class="h5">Contacto</h3>
+                <ul class="list-unstyled">
+                    <li><a href="mailto:contacto@bolivarpropiedades.com" class="text-white">✉️ contacto@bolivarpropiedades.com</a></li>
+                    <li>📞 +58 414-1234567</li>
+                </ul>
+            </div>
+            
+            <div class="col-md-6">
+                <h3 class="h5">Legal</h3>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-white">Términos de uso</a></li>
+                    <li><a href="#" class="text-white">Política de privacidad</a></li>
+                </ul>
             </div>
         </div>
     </div>
+</footer>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
-    <script>
-        <script>
-    const properties = [
-        // tu arreglo de propiedades
-    ];
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
 
-    function initializeMap() {
-        const map = L.map('map').setView([8.297069, -62.716389], 12);
-        L.tileLayer(
-            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            {
-                attribution: '© OpenStreetMap contributors'
-            }
-        ).addTo(map);
-    }
+<script>
+    // Inicialización del Mapa
+    document.addEventListener('DOMContentLoaded', () => {
+        const map = L.map('map').setView([8.297069, -62.716389], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
 
-    function loadProperties() {
-        const grid = document.getElementById('propertyGrid');
-        properties.forEach(prop => {
-            const template = `
-                <div class="col-md-4 mb-3">
-                    <div class="card property-card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">${prop.title}</h5>
-                            <div class="mb-2">
-                                <span class="text-muted">$${prop.price.toLocaleString()}</span>
-                            </div>
-                            <img src="${prop.image}" class="w-100 h-250" alt="${prop.description}">
-                            ...
-                        </div>
-                    </div>
-                </div>
-            `;
-            grid.innerHTML += template;
-        });
-    }
-
-    initializeMap();
+        // Marcador de ejemplo
+        L.marker([8.297069, -62.716389])
+            .addTo(map)
+            .bindPopup('Oficina Principal<br>Bolívar Propiedades');
+    });
 </script>
 
-        // Datos de ejemplo (deberían venir de tu API)
-        const properties = [
-            {
-                id: "a1b2c3d4",
-                title: "Casa Moderna en Ciudad Guayana",
-                type: "casa",
-                priceUSD: 120000,
-                photos: ["photo1.jpg", "photo2.jpg"],
-                location: [8.297069, -62.716389],
-                description: "Hermosa casa con 4 habitaciones...",
-                transactionHash: "0x1a2b3c4d5e..."
-            }
-        ];
-
-        // Inicializar mapa
-        const map = L.map('map').setView([8.297069, -62.716389], 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-        // Cargar propiedades en el grid
-        function loadProperties() {
-            const grid = document.getElementById('propertyGrid');
-            properties.forEach(prop => {
-                grid.innerHTML += `
-                    <div class="col">
-                        <div class="card property-card h-100" onclick="showPropertyDetail('${prop.id}')">
-                            <div class="price-
-        tag">$${prop.priceUSD.toLocaleString()}</div>
-                            <img src="${prop.photos[0]}" class="card-img-top" alt="${prop.title}">
-                            <div class="card-body">
-                                <h5 class="card-title">${prop.title}</h5>
-                                <span class="crypto-badge">🔗 Transacción Blockchain</span>
-                                <p class="text-muted mt-2">${prop.type.charAt(0).toUpperCase() + prop.type.slice(1)}</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        // Mostrar detalle de propiedad
-        function showPropertyDetail(propertyId) {
-            const prop = properties.find(p => p.id === propertyId);
-            document.getElementById('propertyTitle').textContent = prop.title;
-            document.getElementById('propertyPrice').textContent = `USD ${prop.priceUSD.toLocaleString()}`;
-            document.getElementById('propertyDescription').textContent = prop.description;
-            document.getElementById('propertyHash').textContent = prop.transactionHash;
-            
-            const carousel = document.querySelector('#propertyCarousel .carousel-inner');
-            carousel.innerHTML = prop.photos.map((photo, index) => `
-                <div class="carousel-item ${index === 0 ? 'active' : ''}">
-                    <img src="${photo}" class="d-block w-100" alt="Foto ${index + 1}">
-                </div>
-            `).join('');
-
-            new bootstrap.Modal(document.getElementById('propertyModal')).show();
-        }
-
-        // Iniciar transacción
-        function initiateTransaction() {
-            // Lógica de transacción con smart contract
-            alert("🚀 Transacción segura iniciada - Verifique en su wallet");
-        }
-
-        // Cargar inicial
-        window.onload = loadProperties;
-    </script>
 </body>
-</html>
-
-    </section>
-  <br>
-    <img src="img/venta.jpeg" width="400"/>
-    <br>
-    <img src="img/alquiler.jpeg" width="400"/>
-    <br>
-    <img src="img/permutas.jpeg" width="400"/>
-    <br>
-    <img src="img/local.jpeg" width="400"/>
-    <br>
-    <img src="img/negocios.jpeg" width="400"/>
-    <br>
-    <section>
-
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>MarketPlace Inmobiliario</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .map-container { height: 300px; }
-        .upload-btn { position: relative; overflow: hidden; }
-        .upload-btn input[type=file] { position: absolute; top: 0; right: 0; min-width: 100%; min-height: 100%; opacity: 0; }
-    </style>
-</head>
-<body>
-    <div class="container mt-5">
-        <h2 class="mb-4">Publicar Propiedad</h2>
-        
-        <!-- Formulario de Publicación -->
-        <form id="propertyForm" enctype="multipart/form-data">
-            <div class="row g-3">
-                <!-- Sección 1: Datos Básicos -->
-                <div class="col-md-6">
-                    <div class="card p-3 mb-3">
-                        <h4>Información Principal</h4>
-                        <input type="text" class="form-control mb-2" name="titulo" placeholder="Título" required>
-                        <textarea class="form-control mb-2" name="descripcion" placeholder="Descripción" rows="3"></textarea>
-                        <select class="form-select mb-2" name="tipo_operacion" required>
-                            <option value="">Seleccione operación</option>
-                            <option value="venta">Venta</option>
-                            <option value="alquiler">Alquiler</option>
-                            <option value="permuta">Permuta</option>
-                            <option value="negocio">Negocio</option>
-                        </select>
-                        <input type="number" class="form-control mb-2" name="precio" placeholder="Precio (USD)" step="0.01" required>
-                    </form>
-                    </div>
-                </div>
-
-                <!-- Sección 2: Medios y Ubicación -->
-                <div class="col-md-6">
-                    <div class="card p-3 mb-3">
-                        <h4>Medios y Ubicación</h4>
-                        <div class="upload-btn btn btn-primary mb-2">
-                            Subir Fotos (Máx. 5)
-                            <input type="file" name="fotos[]" accept="image/*" multiple>
-                        </div>
-                        
-                        <div id="map-container" class="map-container mb-2"></div>
-                        <input type="text" class="form-control mb-2" id="ubicacion" name="ubicacion" placeholder="Dirección exacta" required>
-                        <input type="file" class="form-control mb-2" name="documentos" accept=".pdf,.doc,.docx" placeholder="Documentos de propiedad">
-                    </div>
-                </div>
-
-                <!-- Sección 3: Contacto y Pagos -->
-                <div class="col-12">
-                    <div class="card p-3">
-                        <h4>Datos de Contacto y Pagos</h4>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <input type="tel" class="form-control mb-2" name="telefono" placeholder="Teléfono" required>
-                            </div>
-                            <div class="col-md-4">
-                                <input type="email" class="form-control mb-2" name="email" placeholder="Email" required>
-                            </div>
-                            <div class="col-md-4">
-                                <select class="form-select mb-2" name="metodo_pago" required>
-                                    <option value="">Método de Pago</option>
-                                    <option value="transferencia">Transferencia</option>
-                                    <option value="efectivo">Efectivo</option>
-                                    <option value="cripto">Criptomonedas</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <!-- Sistema de Contribución -->
-                        <div class="border p-3 mt-2"> 
-
-    </section>
-
-    <br>
-</body>
-
-
-<footer>
-    <a href="mailto:abog.joseperez@gmail.com">Contactame aqui</a>
-
-
-</footer>
 </html>
