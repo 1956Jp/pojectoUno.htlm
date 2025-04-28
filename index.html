@@ -43,7 +43,7 @@
 <!-- Header -->
 <header class="bg-primary text-white py-4">
     <div class="container">
-        <h1 class="mb-0">🏠 Bolívar Propiedades 4.0</h1>
+        <h1 class="mb-0">🏠 Compra,Venta y Alquiler Comunal</h1>
         <p class="lead">Tu mercado inmobiliario inteligente en Puerto Ordaz</p>
     </div>
 </header>
@@ -77,6 +77,109 @@
             </form>
         </div>
     </section>
+    <!-- Añade esta sección después del header y antes del listado de propiedades -->
+<section class="container my-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h4 mb-0">📤 Publica tu Propiedad</h2>
+        </div>
+        
+        <div class="card-body">
+            <form id="publicacionForm" action="/procesar-publicacion" method="POST" enctype="multipart/form-data">
+                <!-- Sección de Tipo de Operación -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label">Tipo de Operación</label>
+                        <select class="form-select" name="operacion" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="venta">Venta</option>
+                            <option value="alquiler">Alquiler</option>
+                            <option value="permuta">Permuta</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-label">Tipo de Propiedad</label>
+                        <select class="form-select" name="tipo_propiedad" required>
+                            <option value="">Seleccionar...</option>
+                            <option value="casa">Casa</option>
+                            <option value="apartamento">Apartamento</option>
+                            <option value="negocio">Negocio</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-label">Precio (USD)</label>
+                        <input type="number" class="form-control" name="precio" step="100" required>
+                    </div>
+                </div>
+
+                <!-- Detalles de la Propiedad -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Título de la Publicación</label>
+                        <input type="text" class="form-control" name="titulo" maxlength="80" required>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">Ubicación Exacta</label>
+                        <input type="text" class="form-control" name="ubicacion" required>
+                    </div>
+                    
+                    <div class="col-12">
+                        <label class="form-label">Descripción Detallada</label>
+                        <textarea class="form-control" name="descripcion" rows="4" maxlength="500" required></textarea>
+                    </div>
+                </div>
+
+                <!-- Características -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <label class="form-label">Área (m²)</label>
+                        <input type="number" class="form-control" name="area" min="20" required>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label">Habitaciones</label>
+                        <input type="number" class="form-control" name="habitaciones" min="1">
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label">Baños</label>
+                        <input type="number" class="form-control" name="banos" min="1">
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label">Año de Construcción</label>
+                        <input type="number" class="form-control" name="anio_construccion" min="1900" max="2024">
+                    </div>
+                </div>
+
+                <!-- Multimedia y Contacto -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Subir Imágenes (Máx. 5)</label>
+                        <input type="file" class="form-control" name="imagenes[]" accept="image/*" multiple>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">Contacto</label>
+                        <div class="input-group">
+                            <span class="input-group-text">📞</span>
+                            <input type="tel" class="form-control" name="telefono" placeholder="Número de contacto" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success w-100">
+                        🚀 Publicar Propiedad
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
 
     <!-- Listado de Propiedades -->
     <section class="row g-4">
